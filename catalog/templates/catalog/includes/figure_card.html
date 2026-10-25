@@ -1,0 +1,15 @@
+<figure class="fig-card">
+  <a href="{{ fig.medium.url|default:fig.image.url }}" class="lb" data-group="{{ group|default:'all' }}"
+     data-caption="{{ fig.species.name }} {% if fig.sex %}{{ fig.get_sex_display }}{% endif %} {% if fig.structure %}· {{ fig.structure.name }}{% endif %}{% if fig.view %} · {{ fig.get_view_display }}{% endif %} — {{ fig.source_label }}"
+     data-detail="{% url 'figure_detail' fig.pk %}" data-original="{{ fig.image.url }}">
+    <img src="{{ fig.thumbnail.url|default:fig.image.url }}" alt="{{ fig.species.name }} {{ fig.source_label }}" loading="lazy">
+  </a>
+  <figcaption>
+    {% if show_species %}<a class="sp" href="{{ fig.species.get_absolute_url }}"><i>{{ fig.species.name }}</i></a>{% endif %}
+    {% if fig.species.is_synonym and not show_species %}<span class="tag tag-syn" title="文獻中使用的名稱">as <i>{{ fig.species.name }}</i></span>{% endif %}
+    <span class="meta">{% if fig.sex %}<span class="sex sex-{{ fig.sex }}">{{ fig.get_sex_display }}</span>{% endif %}
+      {% if show_structure and fig.structure %}{{ fig.structure.name }}{% endif %}
+      {% if fig.view %}<span class="muted">{{ fig.get_view_display }}</span>{% endif %}</span>
+    <a class="src" href="{% url 'figure_detail' fig.pk %}">{{ fig.source_label }}</a>
+  </figcaption>
+</figure>

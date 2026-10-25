@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ ref.short_authors }} {{ ref.year }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="{% url 'reference_list' %}">文獻</a> › {{ ref.short_authors }} {{ ref.year }}</p>
+<h1>{{ ref.short_authors }} {{ ref.year }}</h1>
+<div class="card">
+  <p class="citation" id="cite">{{ ref.citation }}</p>
+  <p class="actions">
+    <button type="button" class="btn-small" data-copy="#cite">複製引用</button>
+    <a class="btn-small" href="{% url 'reference_bibtex' ref.pk %}" target="_blank">BibTeX</a>
+    {% if ref.doi %}<a class="btn-small" href="{{ ref.doi_url }}" target="_blank" rel="noopener">DOI</a>{% endif %}
+    {% if ref.url %}<a class="btn-small" href="{{ ref.url }}" target="_blank" rel="noopener">網址</a>{% endif %}
+    <a class="btn-small" href="{% url 'reference_edit' ref.pk %}">編輯</a>
+    <a class="btn-small" href="{% url 'upload' %}?reference={{ ref.pk }}">從此文獻上傳圖片</a>
+  </p>
+  {% if ref.notes %}<p class="muted">{{ ref.notes|linebreaksbr }}</p>{% endif %}
+</div>
+{% for sp, figs in by_species.items %}
+<section>
+  <h2><a href="{{ sp.get_absolute_url }}"><i>{{ sp.name }}</i></a> <small>{{ sp.author }}</small></h2>
+  <div class="fig-grid">{% for fig in figs %}{% include "catalog/includes/figure_card.html" with show_structure=1 group="ref" %}{% endfor %}</div>
+</section>
+{% empty %}<p class="empty">此文獻還沒有圖片。</p>{% endfor %}
+{% endblock %}

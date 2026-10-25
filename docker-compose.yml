@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: spider
+      POSTGRES_USER: spider
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?請在 .env 設定 POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spider -d spider"]
+      interval: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      POSTGRES_DB: spider
+      POSTGRES_USER: spider
+      POSTGRES_HOST: db
+      MEDIA_ROOT: /app/data/media
+    volumes:
+      - ./data/media:/app/data/media
+      - ./imports:/app/imports:ro
+    ports:
+      - "${PORT:-8000}:8000"
+
+volumes:
+  pgdata:

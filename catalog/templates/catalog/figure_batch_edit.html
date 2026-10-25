@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}補充圖片資訊{% endblock %}
+{% block content %}
+<h1>補充圖片資訊</h1>
+<form method="post" class="form">
+  {% csrf_token %}{{ formset.management_form }}
+  <table class="table batch">
+    <thead><tr><th>圖</th><th>圖號</th><th>頁碼</th><th>構造</th><th>性別</th><th>視角</th><th>備註</th></tr></thead>
+    <tbody>
+    {% for f in formset %}
+      <tr>
+        <td>{{ f.id }}<a href="{{ f.instance.medium.url }}" class="lb" data-group="batch" data-caption="{{ f.instance }}"><img src="{{ f.instance.thumbnail.url }}" class="mini" alt=""></a>
+          <div class="small"><i>{{ f.instance.species.name }}</i></div>{{ f.non_field_errors }}</td>
+        <td>{{ f.figure_number }}</td><td>{{ f.page }}</td><td>{{ f.structure }}</td>
+        <td>{{ f.sex }}</td><td>{{ f.view }}</td><td>{{ f.notes }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <button class="btn" type="submit">儲存</button>
+</form>
+{% endblock %}

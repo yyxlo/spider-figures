@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}搜尋：{{ q }}{% endblock %}
+{% block content %}
+<h1>搜尋「{{ q }}」</h1>
+{% if found.fuzzy %}<p class="note">沒有完全符合的名稱，以下是拼寫相近的結果。</p>{% endif %}
+{% if not total %}
+  <p class="empty">找不到符合的名稱。{% if q %}<a href="{% url 'species_create' %}">新增物種名</a>{% endif %}</p>
+{% endif %}
+{% if found.families %}<h2>科</h2>
+<ul class="list">{% for f in found.families %}<li><a href="{{ f.get_absolute_url }}"><b>{{ f.name }}</b></a> {{ f.author }} {{ f.common_name }}</li>{% endfor %}</ul>{% endif %}
+{% if found.genera %}<h2>屬</h2>
+<ul class="list">{% for g in found.genera %}<li><a href="{{ g.get_absolute_url }}"><i><b>{{ g.name }}</b></i></a> {{ g.author }} {{ g.common_name }} <span class="muted">· {{ g.family.name }}</span></li>{% endfor %}</ul>{% endif %}
+{% if found.species %}<h2>種</h2>
+<ul class="list">{% for s in found.species %}<li>
+  <a href="{{ s.get_absolute_url }}"><i>{{ s.name }}</i></a> {{ s.author }} {{ s.common_name }}
+  {% if s.is_synonym %}<span class="tag tag-syn">→ <i>{{ s.valid_species.name }}</i></span>{% endif %}
+  <span class="muted">· {{ s.genus.family.name }}</span>
+  {% if s.n_figures %}<span class="badge">{{ s.n_figures }} 圖</span>{% endif %}
+</li>{% endfor %}</ul>{% endif %}
+{% endblock %}

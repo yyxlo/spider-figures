@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>查詢物種，直接比對文獻圖</h1>
+  <form action="{% url 'search' %}" method="get" class="bigsearch">
+    <input type="search" name="q" placeholder="例如 Araneus、Araneus ventricosus、Argiope 或中文名" autocomplete="off" data-search-box autofocus>
+    <div class="ac-list" hidden></div>
+    <button class="btn">搜尋</button>
+  </form>
+  <p class="stats">
+    名錄 {{ counts.families }} 科 · {{ counts.genera }} 屬 · {{ counts.species }} 種名　｜
+    已收錄 <b>{{ counts.figures }}</b> 張圖、{{ counts.species_with_figures }} 個物種名、{{ counts.references }} 篇文獻
+  </p>
+</section>
+
+{% if families %}
+<section>
+  <h2>已有圖片的科</h2>
+  <ul class="chips">{% for f in families %}<li><a href="{{ f.get_absolute_url }}">{{ f.name }}{% if f.common_name %} {{ f.common_name }}{% endif %} <span class="muted">{{ f.n_fig }}</span></a></li>{% endfor %}</ul>
+</section>
+{% endif %}
+
+<section>
+  <h2>最近上傳</h2>
+  {% if recent %}
+  <div class="fig-grid">{% for fig in recent %}{% include "catalog/includes/figure_card.html" with show_species=1 show_structure=1 group="recent" %}{% endfor %}</div>
+  {% else %}
+  <p class="empty">還沒有圖片。<a href="{% url 'upload' %}">上傳第一張</a>{% if not counts.species %}，或先請管理者匯入 WSC 名錄（見 README）{% endif %}。</p>
+  {% endif %}
+</section>
+{% endblock %}

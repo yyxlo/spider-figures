@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}文獻{% endblock %}
+{% block content %}
+<h1>文獻</h1>
+<div class="toolbar">
+  <form method="get" class="inline"><input type="search" name="q" value="{{ q }}" placeholder="作者、年份、標題、DOI"><button class="btn-small">搜尋</button></form>
+  <a class="btn-small" href="{% url 'reference_create' %}">新增文獻</a>
+</div>
+<table class="table">
+<thead><tr><th>文獻</th><th class="num">圖片數</th></tr></thead>
+<tbody>{% for r in page %}
+<tr><td><a href="{{ r.get_absolute_url }}">{{ r.citation }}</a></td><td class="num">{{ r.n }}</td></tr>
+{% empty %}<tr><td colspan="2" class="empty">沒有文獻。</td></tr>{% endfor %}</tbody>
+</table>
+{% if page.has_other_pages %}<p class="pager">
+{% if page.has_previous %}<a href="?q={{ q|urlencode }}&page={{ page.previous_page_number }}">‹ 上一頁</a>{% endif %}
+第 {{ page.number }} / {{ page.paginator.num_pages }} 頁
+{% if page.has_next %}<a href="?q={{ q|urlencode }}&page={{ page.next_page_number }}">下一頁 ›</a>{% endif %}</p>{% endif %}
+{% endblock %}

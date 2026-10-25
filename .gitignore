@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/
+backups/
+staticfiles/
+imports/*
+!imports/README.md

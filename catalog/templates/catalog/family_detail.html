@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ family.name }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="{% url 'taxa_index' %}">分類瀏覽</a> › {{ family.name }}</p>
+<h1>{{ family.name }} <small>{{ family.author }} {{ family.common_name }}</small></h1>
+<p>{% if show_all %}顯示全部屬 · <a href="?">只顯示有圖片的屬</a>{% else %}只顯示有圖片的屬 · <a href="?all=1">顯示全部屬</a>{% endif %}</p>
+<table class="table">
+<thead><tr><th>屬</th><th>中文名</th><th class="num">有效種數</th><th class="num">圖片數</th></tr></thead>
+<tbody>{% for g in genera %}
+<tr{% if not g.n_figures %} class="dim"{% endif %}><td><a href="{{ g.get_absolute_url }}"><i>{{ g.name }}</i></a> <span class="muted">{{ g.author }}</span></td><td>{{ g.common_name }}</td><td class="num">{{ g.n_species }}</td><td class="num">{{ g.n_figures }}</td></tr>
+{% empty %}<tr><td colspan="4" class="empty">此科還沒有圖片。<a href="?all=1">顯示全部屬</a></td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

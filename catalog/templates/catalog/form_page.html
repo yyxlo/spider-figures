@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+{% if help %}<p class="muted">{{ help }}</p>{% endif %}
+{% if preview %}<img src="{{ preview.thumbnail.url }}" class="preview" alt="">{% endif %}
+<form method="post" class="card form">{% csrf_token %}
+  {{ form.as_div }}
+  <input type="hidden" name="next" value="{{ request.GET.next }}">
+  <button class="btn" type="submit">儲存</button>
+</form>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ fig }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="{{ fig.species.accepted.get_absolute_url }}"><i>{{ fig.species.accepted.name }}</i></a> › 圖片</p>
+<div class="fig-detail">
+  <div class="zoom-box big"><img src="{{ fig.medium.url|default:fig.image.url }}" alt="{{ fig }}" draggable="false"></div>
+  <aside class="card">
+    <h1><i>{{ fig.species.name }}</i></h1>
+    {% if fig.species.is_synonym %}<p class="note">現行有效名：<a href="{{ fig.species.accepted.get_absolute_url }}"><i>{{ fig.species.accepted.name }}</i></a></p>{% endif %}
+    <dl class="kv">
+      <dt>出處</dt><dd>{{ fig.source_label }}</dd>
+      <dt>構造</dt><dd>{{ fig.structure|default:"—" }}</dd>
+      <dt>性別</dt><dd>{{ fig.get_sex_display }}</dd>
+      <dt>視角</dt><dd>{{ fig.get_view_display }}</dd>
+      {% if fig.notes %}<dt>備註</dt><dd>{{ fig.notes|linebreaksbr }}</dd>{% endif %}
+      <dt>上傳</dt><dd>{{ fig.uploaded_by|default:"—" }} · {{ fig.created_at|date:"Y-m-d H:i" }}</dd>
+    </dl>
+    <h2>文獻</h2>
+    <p class="citation"><a href="{{ fig.reference.get_absolute_url }}">{{ fig.reference.citation }}</a></p>
+    {% if fig.reference.doi %}<p><a href="{{ fig.reference.doi_url }}" target="_blank" rel="noopener">開啟 DOI</a></p>{% endif %}
+    <p><a href="{{ fig.image.url }}" target="_blank">原始檔</a></p>
+    {% if can_modify %}
+    <p class="actions"><a class="btn-small" href="{% url 'figure_edit' fig.pk %}">編輯</a>
+      <form method="post" action="{% url 'figure_delete' fig.pk %}" class="inline" onsubmit="return confirm('確定刪除這張圖？')">{% csrf_token %}<button class="btn-small danger">刪除</button></form></p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

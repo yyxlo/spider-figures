@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ species.name }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="{% url 'taxa_index' %}">分類瀏覽</a> › <a href="{{ accepted.genus.family.get_absolute_url }}">{{ accepted.genus.family.name }}</a> › <a href="{{ accepted.genus.get_absolute_url }}"><i>{{ accepted.genus.name }}</i></a> › <i>{{ accepted.name }}</i></p>
+{% if species.is_synonym %}
+<p class="note"><i>{{ species.full_name }}</i> 是 <a href="{{ accepted.get_absolute_url }}"><i>{{ accepted.name }}</i></a> 的同物異名或舊組合，以下顯示有效名下的所有圖片。</p>
+{% endif %}
+<h1><i>{{ accepted.name }}</i> <small>{{ accepted.author }} {{ accepted.common_name }}</small></h1>
+{% if synonyms %}<p class="muted">文獻中也使用過：{% for s in synonyms %}<i>{{ s.name }}</i> {{ s.author }}{% if not forloop.last %}；{% endif %}{% endfor %}</p>{% endif %}
+<div class="toolbar">
+  {% include "catalog/includes/filters.html"  %}
+  <span class="actions">
+    <button type="button" class="btn-small" data-compare-add="{{ accepted.pk }}" data-name="{{ accepted.name }}">加入比較清單</button>
+    <a class="btn-small" href="{% url 'upload' %}?species={{ species.pk }}">上傳此種的圖</a>
+    {% if accepted.wsc_lsid %}<span class="muted small">LSID {{ accepted.wsc_lsid }}</span>{% endif %}
+  </span>
+</div>
+<p class="muted small">共 {{ n_figures }} 張圖</p>
+{% for structure, figs in sections.items %}
+<section>
+  <h2 class="section-h">{% if structure %}{{ structure.name }} <small>{{ structure.name_en }}</small>{% else %}未分類{% endif %}</h2>
+  <div class="fig-grid">{% for fig in figs %}{% include "catalog/includes/figure_card.html" with group="sp" %}{% endfor %}</div>
+</section>
+{% empty %}
+<p class="empty">還沒有圖片。<a href="{% url 'upload' %}?species={{ species.pk }}">上傳</a></p>
+{% endfor %}
+{% endblock %}

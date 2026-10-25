@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}上傳圖片{% endblock %}
+{% block content %}
+<h1>上傳文獻圖片</h1>
+<p class="muted">同一次上傳的圖片會套用相同的物種、文獻與預設值；下一步可以逐張補上圖號與構造。</p>
+<form method="post" enctype="multipart/form-data" class="card form">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  <fieldset>
+    <legend>1. 物種</legend>
+    {{ form.species.errors }}{{ form.species }}
+    <p class="small muted">請選擇文獻圖上使用的名稱（舊名也可以）。名錄中找不到？<a href="{% url 'species_create' %}" target="_blank">新增物種名</a>（新分頁）</p>
+  </fieldset>
+  <fieldset>
+    <legend>2. 出處文獻</legend>
+    {{ form.reference.errors }}{{ form.reference }}
+    <label class="check"><input type="checkbox" name="new_reference" value="1" data-toggle="#new-ref" {% if form.new_reference_requested %}checked{% endif %}> 這是新文獻，在下面填寫</label>
+    <div id="new-ref" class="subform" {% if not form.new_reference_requested %}hidden{% endif %}>
+      {{ ref_form.as_div }}
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>3. 圖片</legend>
+    {{ form.images.errors }}
+    <div class="dropzone" data-dropzone>
+      {{ form.images }}
+      <p>把圖片拖到這裡，或點擊選擇檔案（可多選）</p>
+      <div class="previews"></div>
+    </div>
+    <p class="small muted">提示：從 PDF 截圖時，盡量一張圖只截一個構造，之後比對比較方便。</p>
+  </fieldset>
+  <fieldset class="grid4">
+    <legend>4. 預設值（可在下一步逐張修改）</legend>
+    <label>{{ form.structure.label }}{{ form.structure }}</label>
+    <label>{{ form.sex.label }}{{ form.sex }}</label>
+    <label>{{ form.view.label }}{{ form.view }}</label>
+    <label>{{ form.page.label }}{{ form.page }}</label>
+  </fieldset>
+  <button class="btn" type="submit">上傳</button>
+</form>
+{% endblock %}

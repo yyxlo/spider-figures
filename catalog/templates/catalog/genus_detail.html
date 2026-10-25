@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ genus.name }}{% endblock %}
+{% block content %}
+<p class="crumbs"><a href="{% url 'taxa_index' %}">分類瀏覽</a> › <a href="{{ genus.family.get_absolute_url }}">{{ genus.family.name }}</a> › <i>{{ genus.name }}</i></p>
+<h1><i>{{ genus.name }}</i> <small>{{ genus.author }} {{ genus.common_name }}</small></h1>
+<div class="toolbar">
+  {% include "catalog/includes/filters.html" with keep_empty=show_empty %}
+  <span class="muted">名錄中 {{ n_species }} 個有效種 ·
+  {% if show_empty %}<a href="?structure={{ selected.structure }}&sex={{ selected.sex }}">隱藏沒有圖的種</a>{% else %}<a href="?structure={{ selected.structure }}&sex={{ selected.sex }}&empty=1">顯示沒有圖的種</a>{% endif %}</span>
+</div>
+<form action="{% url 'compare' %}" method="get" class="genus-compare">
+  <input type="hidden" name="structure" value="{{ selected.structure }}">
+  <input type="hidden" name="sex" value="{{ selected.sex }}">
+  <p class="muted small">勾選物種後按「並排比較」。</p>
+  {% for row in rows %}
+  <section class="sp-row">
+    <h2>
+      <label class="cmp-check"><input type="checkbox" name="species" value="{{ row.species.pk }}"></label>
+      <a href="{{ row.species.get_absolute_url }}"><i>{{ row.species.name }}</i></a>
+      <small>{{ row.species.author }} {{ row.species.common_name }}</small>
+      <span class="muted small">{{ row.figures|length }} 圖</span>
+    </h2>
+    {% if row.figures %}
+    <div class="fig-strip">{% for fig in row.figures %}{% include "catalog/includes/figure_card.html" with show_structure=1 group=row.species.pk %}{% endfor %}</div>
+    {% else %}<p class="empty small">尚無圖片 · <a href="{% url 'upload' %}?species={{ row.species.pk }}">上傳</a></p>{% endif %}
+  </section>
+  {% empty %}
+  <p class="empty">這個條件下沒有圖片。</p>
+  {% endfor %}
+  {% if rows %}<div class="sticky-bar"><button class="btn" type="submit">並排比較勾選的物種</button></div>{% endif %}
+</form>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}並排比較{% endblock %}
+{% block content %}
+<h1>並排比較</h1>
+<div class="toolbar">
+  {% include "catalog/includes/filters.html" with keep_species=ids %}
+  <form class="cmp-add" method="get" data-compare-form>
+    <input type="hidden" name="structure" value="{{ selected.structure }}">
+    <input type="hidden" name="sex" value="{{ selected.sex }}">
+    <input type="hidden" name="species" value="{{ ids }}">
+    <div class="ac-widget" data-kind="species" data-submit-on-pick>
+      <input type="hidden" name="species" value="">
+      <input type="text" class="ac-input" placeholder="加入物種…" autocomplete="off">
+      <div class="ac-list" hidden></div>
+    </div>
+  </form>
+  {% if columns %}<a class="btn-small" href="?structure={{ selected.structure }}&sex={{ selected.sex }}" data-compare-clear>清空</a>{% endif %}
+</div>
+{% if not columns %}
+<p class="empty">從上方加入物種，或在屬頁勾選物種、在物種頁按「加入比較清單」。</p>
+{% else %}
+<p class="muted small">在圖上滾動滑鼠滾輪可放大，拖曳移動，雙擊還原。</p>
+<div class="cmp-grid" style="--cols: {{ columns|length }}">
+  {% for col in columns %}
+  <div class="cmp-col">
+    <div class="cmp-head">
+      <a href="{{ col.species.get_absolute_url }}"><i>{{ col.species.name }}</i></a>
+      <a class="cmp-remove" title="移除" href="?species={{ col.others }}&structure={{ selected.structure }}&sex={{ selected.sex }}">×</a>
+    </div>
+    {% for fig in col.figures %}
+    <div class="cmp-item">
+      <div class="zoom-box"><img src="{{ fig.medium.url|default:fig.image.url }}" alt="" draggable="false"></div>
+      <div class="cmp-cap">{% if fig.sex %}<span class="sex sex-{{ fig.sex }}">{{ fig.get_sex_display }}</span>{% endif %} {{ fig.structure.name|default:"" }}{% if fig.view %} {{ fig.get_view_display }}{% endif %}
+        <a href="{% url 'figure_detail' fig.pk %}">{{ fig.source_label }}</a>{% if fig.species.is_synonym %} <span class="tag tag-syn">as <i>{{ fig.species.name }}</i></span>{% endif %}</div>
+    </div>
+    {% empty %}<p class="empty small">此條件下沒有圖</p>{% endfor %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+<script>window.COMPARE_IDS = "{{ ids }}";</script>
+{% endblock %}

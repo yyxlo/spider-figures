@@ -1,0 +1,5 @@
+<div class="ac-widget" data-kind="{{ widget.kind }}">
+  <input type="hidden" name="{{ widget.name }}" {% if widget.value != None %}value="{{ widget.value }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+  <input type="text" class="ac-input" value="{{ widget.label }}" placeholder="{{ widget.placeholder }}" autocomplete="off">
+  <div class="ac-list" hidden></div>
+</div>

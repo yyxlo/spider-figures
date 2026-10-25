@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}分類瀏覽{% endblock %}
+{% block content %}
+<h1>分類瀏覽</h1>
+<table class="table">
+<thead><tr><th>科</th><th>中文名</th><th class="num">屬數</th><th class="num">圖片數</th></tr></thead>
+<tbody>{% for f in families %}
+<tr{% if not f.n_figures %} class="dim"{% endif %}><td><a href="{{ f.get_absolute_url }}">{{ f.name }}</a> <span class="muted">{{ f.author }}</span></td><td>{{ f.common_name }}</td><td class="num">{{ f.n_genera }}</td><td class="num">{{ f.n_figures }}</td></tr>
+{% empty %}<tr><td colspan="4" class="empty">名錄是空的，請先匯入名錄（見 README）。</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}

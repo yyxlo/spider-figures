@@ -1,0 +1,8 @@
+.venv
+.git
+data
+backups
+staticfiles
+.env
+**/__pycache__
+*.sqlite3

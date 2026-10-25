@@ -1,0 +1,44 @@
+{% load static %}<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}蜘蛛文獻圖片資料庫{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="{% url 'home' %}">蜘蛛文獻圖片資料庫</a>
+  {% if user.is_authenticated %}
+  <form class="topsearch" action="{% url 'search' %}" method="get" role="search">
+    <input type="search" name="q" value="{{ q|default:'' }}" placeholder="科、屬、種學名或中文名" autocomplete="off"
+           data-search-box aria-label="搜尋">
+    <div class="ac-list" hidden></div>
+  </form>
+  <nav class="mainnav">
+    <a href="{% url 'taxa_index' %}">分類瀏覽</a>
+    <a href="{% url 'reference_list' %}">文獻</a>
+    <a href="{% url 'compare' %}" data-compare-link>並排比較 <span class="badge" data-compare-count hidden></span></a>
+    <a href="{% url 'upload' %}" class="btn-small">上傳圖片</a>
+    {% if user.is_staff %}<a href="{% url 'admin:index' %}">後台</a>{% endif %}
+    <form action="{% url 'logout' %}" method="post" class="inline">{% csrf_token %}
+      <button type="submit" class="linklike" title="{{ user.username }}">登出</button>
+    </form>
+  </nav>
+  {% endif %}
+</header>
+<main class="page">
+  {% if messages %}<ul class="messages">{% for m in messages %}<li class="msg-{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<div class="lightbox" hidden>
+  <div class="lb-stage"><img alt=""></div>
+  <div class="lb-caption"></div>
+  <button class="lb-btn lb-close" aria-label="關閉">×</button>
+  <button class="lb-btn lb-prev" aria-label="上一張">‹</button>
+  <button class="lb-btn lb-next" aria-label="下一張">›</button>
+  <div class="lb-hint">滾輪縮放 · 拖曳移動 · 雙擊還原 · Esc 關閉</div>
+</div>
+<script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>
