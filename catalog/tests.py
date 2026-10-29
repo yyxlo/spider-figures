@@ -200,6 +200,19 @@ class ViewTests(BaseTestCase):
         fig = Figure.objects.get()
         self.assertEqual(fig.reference.authors, "Yin, C. M.")
 
+    def test_hidden_new_reference_fields_not_browser_required(self):
+        # Regression: required attributes inside the hidden block blocked every submit
+        # that used an existing reference.
+        form = self.client.get(reverse("upload")).context["ref_form"]
+        for name in ("authors", "year", "title"):
+            self.assertNotIn("required", str(form[name]), name)
+
+    def test_new_reference_fields_validated_server_side(self):
+        self.client.post(reverse("upload"), {
+            "species": self.sp.pk, "new_reference": "1", "images": [make_image()],
+        })
+        self.assertEqual(Figure.objects.count(), 0)
+
     def test_upload_requires_reference(self):
         resp = self.client.post(reverse("upload"), {"species": self.sp.pk, "images": [make_image()]})
         self.assertEqual(resp.status_code, 200)

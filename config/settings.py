@@ -81,6 +81,7 @@ if os.environ.get("POSTGRES_DB"):
         }
     }
 else:
+    (BASE_DIR / "data").mkdir(exist_ok=True)  # data/ is git-ignored, so a fresh clone lacks it
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

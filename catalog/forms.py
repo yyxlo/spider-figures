@@ -71,7 +71,10 @@ class UploadForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.ref_form = ReferenceForm(*args, prefix="ref", **kwargs)
+        # No HTML "required" on the new-reference fields: they sit in a hidden block when an
+        # existing reference is chosen, and browsers silently refuse to submit a form whose
+        # hidden fields fail validation. They are still validated server-side when requested.
+        self.ref_form = ReferenceForm(*args, prefix="ref", use_required_attribute=False, **kwargs)
         self.new_reference_requested = bool(self.data.get("new_reference"))
 
     def is_valid(self):
