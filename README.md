@@ -35,7 +35,11 @@ cp .env.example .env        # Windows PowerShell：copy .env.example .env
 - `DJANGO_SECRET_KEY`：一串隨機長字串。可以用 `python3 -c "import secrets; print(secrets.token_urlsafe(50))"` 產生
 - `POSTGRES_PASSWORD`：資料庫密碼，自己訂一個
 
+這兩個值裡**不要有 `$` 符號**。Docker Compose 會把 `$xxx` 當成變數，出現 `The "xxx" variable is not set` 警告，實際的值也會被改掉。一定要用 `$` 的話，請把整個值用單引號包起來，例如 `POSTGRES_PASSWORD='pa$$word'`。
+
 ### 3. 啟動
+
+先打開 Docker Desktop，等狀態顯示 Engine running。沒有開的話會出現 `failed to connect to the docker API at npipe:////./pipe/docker_engine` 錯誤。
 
 ```bash
 docker compose up -d --build
@@ -59,6 +63,8 @@ docker compose exec web python manage.py createsuperuser
 4. 作業系統防火牆可能需要允許 8000 埠的連入
 
 其他成員的帳號由管理者在後台「使用者」新增。一般成員不需要勾選「工作人員狀態」；勾選後才能進入後台。
+
+如果第一次啟動時密碼設錯（例如被 `$` 改掉），改好 `.env` 後要清掉資料庫重建：`docker compose down -v` 再 `docker compose up -d --build`。**`-v` 會刪除資料庫**，只在還沒有資料時使用。
 
 ### 停止、更新
 
