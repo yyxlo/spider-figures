@@ -306,3 +306,39 @@ class FuzzySearchTests(BaseTestCase):
         resp = self.client.get(reverse("search"), {"q": "Araneus ventricosis"})  # typo
         self.assertTrue(resp.context["found"].get("fuzzy"))
         self.assertIn(self.sp, resp.context["found"]["species"])
+
+
+class ExportStaticTests(BaseTestCase):
+    def test_export_builds_nas_library(self):
+        import json
+        custom = Structure.objects.create(name="書肺", name_en="book lungs", order=55)
+        fig = self.add_figure(species=self.syn)
+        self.add_figure(structure=custom, sex="F")
+        out = Path(tempfile.mkdtemp()) / "lib"
+        self.addCleanup(shutil.rmtree, out.parent, True)
+        call_command("export_static", str(out), stdout=io.StringIO())
+
+        self.assertTrue((out / "index.html").exists())
+        taxa = (out / "data" / "taxa.js").read_text(encoding="utf-8")
+        self.assertIn('"Aranea", "ventricosa", "", "", "", "", "Araneus ventricosus"', taxa)
+        self.assertIn("大腹鬼蛛", taxa)
+        rec = json.loads((out / "data" / "records" / "figure" / f"fig-{fig.pk}.json").read_text(encoding="utf-8"))
+        self.assertEqual(rec["species"], "Aranea ventricosa")
+        self.assertEqual(rec["structure"], "s-palp")
+        self.assertEqual(rec["reference"], f"ref-{self.ref.pk}")
+        self.assertEqual(rec["by"], "alice")
+        for key in ("original", "medium", "thumb"):
+            self.assertTrue((out / rec["files"][key]).exists(), key)
+        self.assertTrue(list((out / "data" / "records" / "structure").glob("s-dj*.json")))
+        index = (out / "data" / "index.js").read_text(encoding="utf-8")
+        self.assertTrue(index.startswith("window.SPIDER_INDEX = "))
+        self.assertEqual(index.count('"type": "figure"'), 2)
+
+    def test_export_refuses_non_empty_destination(self):
+        from django.core.management.base import CommandError
+        out = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, out, True)
+        (out / "x.txt").write_text("keep me")
+        with self.assertRaises(CommandError):
+            call_command("export_static", str(out), stdout=io.StringIO())
+        self.assertEqual((out / "x.txt").read_text(), "keep me")

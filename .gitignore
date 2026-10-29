@@ -2,8 +2,8 @@
 __pycache__/
 *.pyc
 .env
-data/
-backups/
-staticfiles/
+/data/
+/backups/
+/staticfiles/
 imports/*
 !imports/README.md
